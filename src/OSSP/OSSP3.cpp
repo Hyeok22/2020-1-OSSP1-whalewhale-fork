@@ -314,6 +314,8 @@ int main(int argc, char* argv[])
 	/*k max(여기서 10)은 비교할 그림 개수
 	(테스트라 10개만, 나중에 파일 속 이미지 수 나타내는 함수로 수정)
 	사각형 면적(area)이 제일 큰 이미지를 일치하는 그림이라 보고 그 그림이 저장된 index로 출력*/
+	std::vector<double> areas(NUM_IMG, -1); // 면적을 저장할 벡터 초기화
+
 	for (int k = 0; k < NUM_IMG; k++) {
 		paintings[k].image.copyTo(img1);
 
@@ -322,40 +324,36 @@ int main(int argc, char* argv[])
 		matcher.match(descriptors1, descriptors2, matches);
 		img_matches = drawGoodMatches(img1.getMat(ACCESS_READ), img2.getMat(ACCESS_READ), keypoints1, keypoints2, matches, corner, area_corner);
 
-		//std::cout << corner[0] + Point2f((float)img1.cols, 0) << std::endl;
-		//std::cout << corner[1] + Point2f((float)img1.cols, 0) << std::endl;
-		//std::cout << corner[2] + Point2f((float)img1.cols, 0) << std::endl;
-		//std::cout << corner[3] + Point2f((float)img1.cols, 0) << std::endl;
+		// area_corner의 x, y 값 추출
+		double x_min = area_corner[0].x;
+		double x_max = area_corner[1].x;
+		double y_min = area_corner[0].y;
+		double y_max = area_corner[2].y;
 
-		x_min = area_corner[0].x;
-		x_max = area_corner[1].x;
-		y_min = area_corner[0].y;
-		y_max = area_corner[2].y;
+		// 코너 좌표를 배열에 저장
+		std::vector<Point2f> corners = {
+			corner[0] + Point2f((float)img1.cols, 0),
+			corner[1] + Point2f((float)img1.cols, 0),
+			corner[2] + Point2f((float)img1.cols, 0),
+			corner[3] + Point2f((float)img1.cols, 0)
+		};
 
-		if (x_min < corner[0].x + Point2f((float)img1.cols, 0).x &&
-			x_max > corner[0].x + Point2f((float)img1.cols, 0).x &&
-			y_min < corner[0].y + Point2f((float)img1.cols, 0).y &&
-			y_max > corner[0].y + Point2f((float)img1.cols, 0).y &&
-			x_min < corner[1].x + Point2f((float)img1.cols, 0).x &&
-			x_max > corner[1].x + Point2f((float)img1.cols, 0).x &&
-			y_min < corner[1].y + Point2f((float)img1.cols, 0).y &&
-			y_max > corner[1].y + Point2f((float)img1.cols, 0).y &&
-			x_min < corner[2].x + Point2f((float)img1.cols, 0).x &&
-			x_max > corner[2].x + Point2f((float)img1.cols, 0).x &&
-			y_min < corner[0].y + Point2f((float)img1.cols, 0).y &&
-			y_max > corner[2].y + Point2f((float)img1.cols, 0).y &&
-			x_min < corner[3].x + Point2f((float)img1.cols, 0).x &&
-			x_max > corner[3].x + Point2f((float)img1.cols, 0).x &&
-			y_min < corner[3].y + Point2f((float)img1.cols, 0).y &&
-			y_max > corner[3].y + Point2f((float)img1.cols, 0).y) {
-			area_ = getArea(corner[0].x, corner[1].x, corner[2].x, corner[3].x,
+		// 모든 코너 검사
+		bool isInside = true;
+		for (const auto& c : corners) {
+			if (c.x < x_min || c.x > x_max || c.y < y_min || c.y > y_max) {
+				isInside = false;
+				break;
+			}
+		}
+
+		// 면적 계산
+		if (isInside) {
+			areas[k] = getArea(corner[0].x, corner[1].x, corner[2].x, corner[3].x,
 				corner[0].y, corner[1].y, corner[2].y, corner[3].y);
 		}
-		else area_ = -1;
 
-		std::cout << "Area is = " << area_ << std::endl;
-		area.push_back(area_);
-		printf("%d", k);
+		std::cout << "Area for painting " << k << " is = " << areas[k] << std::endl;
 	}
 	//area을 0번부터 비교해서 index찾기
 	max = area[0];
