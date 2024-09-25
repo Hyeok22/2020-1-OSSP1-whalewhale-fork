@@ -1,6 +1,7 @@
 #include <iostream>
 #include <Windows.h>
 #include <fstream>
+#include <cmath>
 #include "opencv2/core.hpp"
 #include "opencv2/core/utility.hpp"
 #include "opencv2/core/ocl.hpp"
@@ -45,29 +46,16 @@ static double getTime()
 static double getArea(double x1, double x2, double x3, double x4,
 	double y1, double y2, double y3, double y4)
 {
-	long long sum = 0;
-	double ans;
+	vector<double> X = { x1, x2, x3, x4, x1 }; // 첫 점을 다시 추가
+	vector<double> Y = { y1, y2, y3, y4, y1 }; // 첫 점을 다시 추가
 
-	vector<int> X, Y;
-	for (int i = 0; i < 4; i++) {
-		X.push_back(x1);
-		X.push_back(x2);
-		X.push_back(x3);
-		X.push_back(x4);
-		Y.push_back(y1);
-		Y.push_back(y2);
-		Y.push_back(y3);
-		Y.push_back(y4);
+	double area = 0.0;
+
+	for (size_t i = 0; i < 4; i++) {
+		area += (X[i] * Y[i + 1]) - (X[i + 1] * Y[i]);
 	}
-	X.push_back(X.front());
-	Y.push_back(Y.front());
-	long long yy = 0;
-	for (int i = 1; i < 4; i++) {
-		yy += Y[i] - Y[i - 1];
-		sum += (X[i + 1] - X[i - 1]) * yy;
-	}
-	ans = sum / (double)2;
-	return abs(ans);
+
+	return abs(area) / 2.0; // 절대값과 2로 나누기
 }
 class Painting {
 public:
