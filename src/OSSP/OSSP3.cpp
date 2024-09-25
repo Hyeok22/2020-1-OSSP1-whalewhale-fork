@@ -314,8 +314,6 @@ int main(int argc, char* argv[])
 	/*k max(여기서 10)은 비교할 그림 개수
 	(테스트라 10개만, 나중에 파일 속 이미지 수 나타내는 함수로 수정)
 	사각형 면적(area)이 제일 큰 이미지를 일치하는 그림이라 보고 그 그림이 저장된 index로 출력*/
-	std::vector<double> areas(NUM_IMG, -1); // 면적을 저장할 벡터 초기화
-
 	for (int k = 0; k < NUM_IMG; k++) {
 		paintings[k].image.copyTo(img1);
 
@@ -347,14 +345,15 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		// 면적 계산
-		if (isInside) {
-			areas[k] = getArea(corner[0].x, corner[1].x, corner[2].x, corner[3].x,
-				corner[0].y, corner[1].y, corner[2].y, corner[3].y);
-		}
+		// 면적 계산 및 벡터에 추가
+		double area_ = isInside ? getArea(corner[0].x, corner[1].x, corner[2].x, corner[3].x,
+			corner[0].y, corner[1].y, corner[2].y, corner[3].y) : -1;
 
-		std::cout << "Area for painting " << k << " is = " << areas[k] << std::endl;
+		area.push_back(area_); // 면적을 벡터에 추가
+
+		std::cout << "Area for painting " << k << " is = " << area[k] << std::endl;
 	}
+
 	//area을 0번부터 비교해서 index찾기
 	max = area[0];
 
