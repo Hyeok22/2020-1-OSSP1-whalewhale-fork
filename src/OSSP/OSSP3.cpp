@@ -15,6 +15,8 @@ using namespace cv;
 using namespace cv::xfeatures2d;
 using namespace std;
 
+#define MAX_IMG_SIZE 800
+
 const int LOOP_NUM = 37;
 const int num_info = 7;
 const int GOOD_PTS_MAX = 30;
@@ -236,7 +238,7 @@ int main(int argc, char* argv[])
 	cout << endl << "size : " << img2.cols << ", " << img2.rows;
 
 	// input image가 너무 크면 사이즈 조정
-	if (img2.rows > 800 && img2.cols > 800) {
+	if (img2.rows > MAX_IMG_SIZE && img2.cols > MAX_IMG_SIZE) {
 		UMat dst;
 		resize(img2, dst, Size((img2.rows * 550) / img2.rows, (img2.cols * 550) / img2.rows), 0, 0, CV_INTER_LINEAR);
 		//imshow("after", dst);
@@ -266,22 +268,22 @@ int main(int argc, char* argv[])
 			getline(fs, str_buf[j], ',');
 			switch (j) {
 			case 0:
-				p.name = str_buf[0];
+				p.name = str_buf[j];
 				break;
 			case 1:
-				p.born_death = str_buf[1];
+				p.born_death = str_buf[j];
 				break;
 			case 2:
-				p.title = str_buf[2];
+				p.title = str_buf[j];
 				break;
 			case 3:
-				p.madein = str_buf[3];
+				p.madein = str_buf[j];
 				break;
 			case 4:
-				p.material = str_buf[4];
+				p.material = str_buf[j];
 				break;
 			case 5:
-				p.location = str_buf[5];
+				p.location = str_buf[j];
 				break;
 			default:
 				getline(fs, str_buf[j], '\n');
